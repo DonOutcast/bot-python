@@ -1,6 +1,7 @@
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 import sqlite3 as sq
 
 bot = Bot(token="5313740279:AAH6zinVH2efOiBk9yfaHLvIkBu-uLE6dBc")
@@ -20,7 +21,10 @@ def sql_start():
 
 
 async def sql_add_command(user_id, first_name, last_name):
-    cur.execute('INSERT INTO users_tel VALUES (?, ?, ?)', (user_id, first_name, last_name))
+    try:
+        cur.execute('INSERT INTO users_tel VALUES (?, ?, ?);', (user_id, first_name, last_name))
+    except:
+        pass
     base.commit()
 
 
@@ -30,6 +34,7 @@ async def sql_read(message):
 
 
 async def get_info(message: types.Message):
+    await message.delete()
     information = "Welcome to simple bot this bot can show you how user have in data base"
     chat_id = message.chat.id
     await bot.send_message(chat_id=chat_id, text=information)
@@ -43,26 +48,22 @@ async def get_start(message: types.Message):
     if message.from_user.last_name is not None:
         last_name = message.from_user.last_name
     text = f"Hello  {first_name} {last_name}!"
-    print(message.from_user.to_python())
-    await bot.send_message(chat_id=chat_id, text=text)
-
-
-async def get_admin(message: types.Message):
-    await bot.send_message(chat_id=1134902789, text="You are an admin of the specified chat!")
-
-
-async def add_training(message: types.Message):
-    # await bot.send_message(chat_id=message.from_user.id, text="Введите номер")
+    await bot.send_message(chat_id=chat_id, text=text, reply_markup=kb_client)
     user_id = message.from_user.id
     first_name = message.from_user.first_name
     last_name = message.from_user.last_name
-    # await bot.send_message(chat_id=message.from_user.id, text="Введите описание")
-    # text = message.text
     await sql_add_command(user_id, first_name, last_name)
-    await bot.send_message(message.from_user.id, "Номер успешно добавлен")
+    await bot.send_message(message.from_user.id, "Вы успешно добавленны!")
+
+
+b1 = KeyboardButton("Show all")
+b2 = KeyboardButton("Info")
+kb_client = ReplyKeyboardMarkup(resize_keyboard=True)
+kb_client.add(b1).add(b2)
 
 
 async def output(message: types.Message):
+    await message.delete()
     await sql_read(message)
 
 
@@ -72,15 +73,10 @@ async def empty(message: types.Message):
                          parse_mode="Markdown")
 
 
-
-
-
 def register_handlers_admin(dis: Dispatcher):
-    dis.register_message_handler(get_start, lambda message: message.text == 'start' or message.text == "Start")
-    dis.register_message_handler(get_info, commands=['help'])
-    dis.register_message_handler(add_training, commands=["add"])
-    dis.register_message_handler(output, commands=["show"])
-    # dis.register_message_handler(get_admin, chat_id=1134902789)
+    dis.register_message_handler(get_start, commands=['start'])
+    dis.register_message_handler(get_info, lambda  message: message.text == "Info")
+    dis.register_message_handler(output, lambda message: message.text == "Show all")
     dis.register_message_handler(empty)
 
 
@@ -91,14 +87,5 @@ async def on_starttup(_):
 if __name__ == "__main__":
     register_handlers_admin(dp)
     executor.start_polling(dp, on_startup=on_starttup)
-# nums = [-10,-3,0,5,9]
-# length = len(nums)
-#
-# nums.sort(reverse=True)
-# temp = nums[0]
-# for i in nums:
-#
-#     if temp < i and 0 not in nums:
-#         temp = i
-# nums.insert(0, temp)
-# print(nums)
+    base.close()
+
