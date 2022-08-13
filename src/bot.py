@@ -87,5 +87,4 @@ async def on_starttup(_):
 if __name__ == "__main__":
     register_handlers_admin(dp)
     executor.start_polling(dp, on_startup=on_starttup)
-    base.close()
 
