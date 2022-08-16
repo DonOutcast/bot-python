@@ -4,7 +4,7 @@ from aiogram.utils import executor
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 import sqlite3 as sq
 
-bot = Bot(token="5313740279:AAH6zinVH2efOiBk9yfaHLvIkBu-uLE6dBc")
+bot = Bot(token="")
 
 dp = Dispatcher(bot)
 
