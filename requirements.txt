@@ -1,0 +1,5 @@
+aiogram==3.0.0b6
+python-dotenv==0.20.0
+aioredis~=2.0
+environs~=9.0
+SQLAlchemy~=1.4.46
